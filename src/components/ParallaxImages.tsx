@@ -13,7 +13,6 @@ const BOARD_CONFIG = {
 
 export const ParallaxImages: React.FC = () => {
   const [ready, setReady] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -30,68 +29,58 @@ export const ParallaxImages: React.FC = () => {
   const sliderUnlocked = useRef(false);
   const firstVideoStarted = useRef(false);
 
-  // 🚫 BLOCCA LO SCROLL SU MOBILE
+  /* 🚫 NO SCROLL MOBILE */
   useEffect(() => {
-    const preventScroll = (e: TouchEvent) => {
-      e.preventDefault();
-    };
-
-    document.addEventListener("touchmove", preventScroll, { passive: false });
     document.body.style.overflow = "hidden";
+    const preventScroll = (e: TouchEvent) => e.preventDefault();
+    document.addEventListener("touchmove", preventScroll, { passive: false });
 
     return () => {
-      document.removeEventListener("touchmove", preventScroll);
       document.body.style.overflow = "";
+      document.removeEventListener("touchmove", preventScroll);
     };
   }, []);
 
-  // 🎞️ PRELOAD MEDIA
+  /* 🎞️ PRELOAD VIDEO */
   useEffect(() => {
-    const video1 = video1Ref.current;
-    const video2 = video2Ref.current;
-    const audio = audioRef.current;
+    const v1 = video1Ref.current;
+    const v2 = video2Ref.current;
+    if (!v1 || !v2) return;
 
-    if (!video1 || !video2 || !audio) return;
-
-    const media = [video1, video2];
     let loaded = 0;
-
     const done = () => {
       loaded++;
-      if (loaded === media.length) setReady(true);
+      if (loaded >= 2) setReady(true);
     };
 
-    media.forEach((m) => {
+    [v1, v2].forEach((m) => {
       if (m.readyState >= 3) done();
       else m.addEventListener("canplaythrough", done, { once: true });
     });
   }, []);
 
-  /* 🔒 FALLBACK per iPhone se canplaythrough non arriva */
+  /* 📌 FALLBACK iPhone */
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 6000);
+    const t = setTimeout(() => setReady(true), 5000);
     return () => clearTimeout(t);
   }, []);
 
-  // 🔊 AUDIO DOPO INTERAZIONE
-  useEffect(() => {
-    const unlock = () => {
-      setAudioEnabled(true);
-      document.removeEventListener("click", unlock);
-      document.removeEventListener("touchstart", unlock);
-    };
-    document.addEventListener("click", unlock);
-    document.addEventListener("touchstart", unlock);
-  }, []);
-
+  /* 🔊 AUDIO SOLO DA CLICK BOTTONE */
   const toggleAudio = () => {
-    if (!audioRef.current || !audioEnabled) return;
-    audioRef.current.muted = !audioRef.current.muted;
-    setIsMuted(audioRef.current.muted);
-    if (!audioRef.current.muted) audioRef.current.play().catch(() => {});
+    if (!audioRef.current) return;
+
+    if (audioRef.current.muted) {
+      audioRef.current.muted = false;
+      setIsMuted(false);
+      audioRef.current.play().catch(() => {});
+    } else {
+      audioRef.current.muted = true;
+      setIsMuted(true);
+      audioRef.current.pause();
+    }
   };
 
-  // 🎬 ANIMAZIONI E LOGICA VIDEO
+  /* 🎬 ANIMAZIONI */
   useLayoutEffect(() => {
     if (!ready) return;
 
@@ -102,6 +91,12 @@ export const ParallaxImages: React.FC = () => {
     const text = textRef.current!;
     const center = centerRef.current!;
     const container = containerRef.current!;
+
+    /* Forza anteprima frame su iPhone */
+    v1.play().catch(() => {});
+    setTimeout(() => v1.pause(), 90);
+    v2.play().catch(() => {});
+    setTimeout(() => v2.pause(), 90);
 
     gsap.to("#preloader", { autoAlpha: 0, duration: 0.4 });
     gsap.to(center, { scale: 1.12, opacity: 0.9, repeat: -1, yoyo: true });
@@ -118,11 +113,18 @@ export const ParallaxImages: React.FC = () => {
       v1.onended = () => {
         gsap.to(v1, { opacity: 0, duration: 0.8 });
         gsap.to(v2, { opacity: 1, duration: 0.8 });
+
         gsap.to([text, track], { opacity: 1, delay: 0.5 });
+
+        /* Mostra subito frame di v2 */
+        v2.play().catch(() => {});
+        setTimeout(() => v2.pause(), 90);
+
         v2.onended = () => setShowCalendar(true);
       };
     };
 
+    /* TAP / DOPPIO TAP */
     let lastTap = 0;
     container.addEventListener("dblclick", playFirst);
     container.addEventListener("touchend", () => {
@@ -131,6 +133,7 @@ export const ParallaxImages: React.FC = () => {
       lastTap = now;
     });
 
+    /* SLIDER */
     Draggable.create(knob, {
       type: "x",
       bounds: track,
@@ -138,14 +141,12 @@ export const ParallaxImages: React.FC = () => {
         gsap.to(text, { opacity: 1 - (this.x / this.maxX) * 1.5 });
       },
       onDragEnd() {
-        const p = this.x / this.maxX;
-        if (p > 0.85) {
-          sliderUnlocked.current = true;
+        if (this.x / this.maxX > 0.85) {
           gsap.to([track, text], { opacity: 0 });
           v2.currentTime = 0;
-          v2.play();
+          v2.play().catch(() => {});
         } else {
-          gsap.to(knob, { x: 0, ease: "elastic.out(1,0.4)" });
+          gsap.to(knob, { x: 0 });
           gsap.to(text, { opacity: 1 });
         }
       },
@@ -161,15 +162,14 @@ export const ParallaxImages: React.FC = () => {
           width: 100%;
           position: fixed;
           inset: 0;
-          touch-action: none;
         }
         body { overscroll-behavior: none; }
         .scene-container {
+          aspect-ratio: 16/9;
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          aspect-ratio: 16/9;
           overflow: hidden;
         }
         @media (min-aspect-ratio: 16/9) {
@@ -186,30 +186,60 @@ export const ParallaxImages: React.FC = () => {
         </div>
       )}
 
+      {/* AUDIO BUTTON */}
       <button
         onClick={toggleAudio}
-        disabled={!audioEnabled}
         className="fixed top-6 right-6 z-[999] text-white p-3 bg-white/30 backdrop-blur-md rounded-full"
-        style={{ opacity: audioEnabled ? 1 : 0.3 }}
       >
         {isMuted ? "🔇" : "🔊"}
       </button>
 
-      <audio ref={audioRef} src="/img/musica.mp3" loop preload="auto" muted />
+      <audio
+        ref={audioRef}
+        src="/img/musica.mp3"
+        preload="auto"
+        playsInline
+        loop
+        muted
+      />
 
       <div ref={containerRef} className="scene-container">
 
-        <video ref={video1Ref} src="/img/videoStart.mp4" muted playsInline className="absolute w-full h-full object-cover" />
+        {/* Video 1 */}
+        <video
+          ref={video1Ref}
+          src="/img/videoStart.mp4"
+          playsInline
+          muted
+          autoPlay
+          preload="auto"
+          poster="/img/imgStart.jpg"
+          className="absolute w-full h-full object-cover"
+        />
+
         <div ref={centerRef} className="absolute top-[65%] left-1/2 w-20 h-20 border-4 border-white rounded-full -translate-x-1/2 -translate-y-1/2" />
-        <video ref={video2Ref} src="/img/videoInterno1.mp4" muted playsInline className="absolute w-full h-full object-cover opacity-0" />
 
-        <h2 ref={textRef} className="absolute top-[48%] w-full text-center text-white opacity-0 tracking-[0.3em]">TRASCINA PER CONTINUARE</h2>
+        {/* Video 2 */}
+        <video
+          ref={video2Ref}
+          src="/img/videoInterno1.mp4"
+          playsInline
+          muted
+          preload="auto"
+          poster="/img/interno.jpg"
+          className="absolute w-full h-full object-cover opacity-0"
+        />
 
+        {/* Slider */}
+        <h2 ref={textRef} className="absolute top-[48%] w-full text-center text-white opacity-0 tracking-[0.3em]">
+          TRASCINA PER CONTINUARE
+        </h2>
         <div ref={trackRef} className="absolute top-[55%] left-1/2 w-[270px] h-10 -translate-x-1/2 opacity-0">
           <div className="absolute inset-0 -translate-y-1/2 border-b border-white/40" />
           <div ref={knobRef} className="absolute left-0 w-10 h-10 border-2 border-white rounded-full" />
         </div>
 
+        {/* CALENDARIO */}
         {showCalendar && (
           <div
             className="absolute z-[50]"
@@ -218,7 +248,6 @@ export const ParallaxImages: React.FC = () => {
               top: `${BOARD_CONFIG.top}%`,
               width: `${BOARD_CONFIG.width}%`,
               height: `${BOARD_CONFIG.height}%`,
-              //border: "2px dashed red", // DEBUG
               pointerEvents: "none",
             }}
           >
@@ -227,36 +256,32 @@ export const ParallaxImages: React.FC = () => {
               style={{
                 gridTemplateColumns: "repeat(5, 1fr)",
                 gridTemplateRows: "repeat(3, 1fr)",
-                gridRowGap: "12%", 
-                gridColumnGap: "4%",   
+                rowGap: "10%",
+                columnGap: "3%",
               }}
             >
               {[20, 21, 22, 23, 24, 27, 28, 29, 30, 31, 2, 3, 4, 5, 6].map((day) => (
                 <button
                   key={day}
                   onClick={() => setSelectedImage(`/img/events/${day}.jpg`)}
-                  className="w-[80%] h-[80%] cursor-pointer pointer-events-auto text-red-600 font-black text-[19px]"
-                  style={{ opacity: "0" }}
-                >
-                  {day}
-                </button>
+                  className="cursor-pointer pointer-events-auto"
+                  style={{ opacity: 0, width: "80%", height: "80%" }}
+                />
               ))}
             </div>
           </div>
         )}
-
       </div>
 
       {selectedImage && (
         <div className="fixed inset-0 bg-black/80 z-[999] flex items-center justify-center">
           <img src={selectedImage} className="max-w-[80%] max-h-[80%] rounded-xl" />
-<button
-  onClick={() => setSelectedImage(null)}
-  className="absolute top-8 right-8 text-red-600 text-3xl font-bold"
->
-  X
-</button>
-
+          <button
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-8 right-8 text-red-600 text-3xl"
+          >
+            X
+          </button>
         </div>
       )}
     </>
