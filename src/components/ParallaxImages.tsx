@@ -89,6 +89,7 @@ export const ParallaxImages: React.FC = () => {
     const v1 = video1Ref.current!;
     const v2 = video2Ref.current!;
     const p1 = poster1.current!;
+    const p2 = poster2.current!;
     const knob = knobRef.current!;
     const track = trackRef.current!;
     const text = textRef.current!;
@@ -109,7 +110,7 @@ export const ParallaxImages: React.FC = () => {
       v1.play();
       v1.onended = () => {
         gsap.to(v1, { opacity: 0, duration: 0.8 });
-        gsap.to(v2, { opacity: 1, duration: 0.8 });
+        gsap.to([v2,p2], { opacity: 1, duration: 0.8 });
 
         gsap.to([text, track], { opacity: 1, delay: 0.5 });
 
