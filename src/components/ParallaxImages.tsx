@@ -18,6 +18,8 @@ export const ParallaxImages: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const poster1= useRef<HTMLImageElement>(null);
+  const poster2= useRef<HTMLImageElement>(null);
   const video1Ref = useRef<HTMLVideoElement>(null);
   const video2Ref = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -86,17 +88,12 @@ export const ParallaxImages: React.FC = () => {
 
     const v1 = video1Ref.current!;
     const v2 = video2Ref.current!;
+    const p1 = poster1.current!;
     const knob = knobRef.current!;
     const track = trackRef.current!;
     const text = textRef.current!;
     const center = centerRef.current!;
     const container = containerRef.current!;
-
-    /* Forza anteprima frame su iPhone */
-    v1.play().catch(() => {});
-    setTimeout(() => v1.pause(), 90);
-    v2.play().catch(() => {});
-    setTimeout(() => v2.pause(), 90);
 
     gsap.to("#preloader", { autoAlpha: 0, duration: 0.4 });
     gsap.to(center, { scale: 1.12, opacity: 0.9, repeat: -1, yoyo: true });
@@ -106,7 +103,7 @@ export const ParallaxImages: React.FC = () => {
       firstVideoStarted.current = true;
 
       gsap.killTweensOf(center);
-      gsap.to(center, { opacity: 0 });
+      gsap.to([center,p1], { opacity: 0 });
 
       v1.currentTime = 0;
       v1.play();
@@ -115,10 +112,6 @@ export const ParallaxImages: React.FC = () => {
         gsap.to(v2, { opacity: 1, duration: 0.8 });
 
         gsap.to([text, track], { opacity: 1, delay: 0.5 });
-
-        /* Mostra subito frame di v2 */
-        v2.play().catch(() => {});
-        setTimeout(() => v2.pause(), 90);
 
         v2.onended = () => setShowCalendar(true);
       };
@@ -205,19 +198,33 @@ export const ParallaxImages: React.FC = () => {
 
       <div ref={containerRef} className="scene-container">
 
+                {/* Poster sotto Video1 */}
+        <img
+          ref={poster1}
+          src="/img/imgStart.jpeg"
+          className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-1"
+          alt="poster1"
+        />
+
         {/* Video 1 */}
         <video
           ref={video1Ref}
           src="/img/videoStart.mp4"
           playsInline
           muted
-          autoPlay
           preload="auto"
           poster="/img/imgStart.jpg"
           className="absolute w-full h-full object-cover"
         />
 
         <div ref={centerRef} className="absolute top-[65%] left-1/2 w-20 h-20 border-4 border-white rounded-full -translate-x-1/2 -translate-y-1/2" />
+
+        <img
+          ref={poster2}
+          src="/img/interno.jpeg"
+          className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-0"
+          alt="poster2"
+        />
 
         {/* Video 2 */}
         <video
