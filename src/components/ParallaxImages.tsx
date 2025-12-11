@@ -242,7 +242,7 @@ export const ParallaxImages: React.FC = () => {
         <img
           ref={poster1}
           src="/img/frameStartDisegno.png"
-          className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-1"
+          className="absolute object-fill pointer-events-none z-[0] opacity-1"
           alt="poster1"
         />
 
@@ -254,7 +254,7 @@ export const ParallaxImages: React.FC = () => {
           muted
           preload="auto"
           poster="/img/imgStart.jpg"
-          className="absolute w-full h-full object-cover"
+          className="absolute object-fill"
         />
 
         <div ref={centerRef} className="absolute top-[65%] left-1/2 w-20 h-20 border-4 border-white rounded-full -translate-x-1/2 -translate-y-1/2" />
@@ -264,7 +264,7 @@ export const ParallaxImages: React.FC = () => {
         <img
           ref={poster2}
           src="/img/frame-2.png"
-          className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-0"
+          className="absolute object-fill pointer-events-none z-[0] opacity-0"
           alt="poster2"
         />
 
@@ -276,7 +276,7 @@ export const ParallaxImages: React.FC = () => {
           muted
           preload="auto"
           poster="/img/interno.jpg"
-          className="absolute w-full h-full object-cover opacity-0"
+          className="absolute object-fill opacity-0"
         />
 
         {/* Slider */}
