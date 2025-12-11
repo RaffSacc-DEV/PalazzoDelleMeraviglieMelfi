@@ -20,6 +20,7 @@ export const ParallaxImages: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const poster1= useRef<HTMLImageElement>(null);
   const poster2= useRef<HTMLImageElement>(null);
+  const loghiref= useRef<HTMLImageElement>(null);
   const video1Ref = useRef<HTMLVideoElement>(null);
   const video2Ref = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -28,6 +29,7 @@ export const ParallaxImages: React.FC = () => {
   const centerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
   const textRef1 = useRef<HTMLHeadingElement>(null);
+  const textRef2 = useRef<HTMLHeadingElement>(null);
 
   const sliderUnlocked = useRef(false);
   const firstVideoStarted = useRef(false);
@@ -91,22 +93,24 @@ export const ParallaxImages: React.FC = () => {
     const v2 = video2Ref.current!;
     const p1 = poster1.current!;
     const p2 = poster2.current!;
+    const loghi = loghiref.current!;
     const knob = knobRef.current!;
     const track = trackRef.current!;
     const text = textRef.current!;
     const text1 = textRef1.current!;
+    const text2 = textRef2.current!;
     const center = centerRef.current!;
     const container = containerRef.current!;
 
     gsap.to("#preloader", { autoAlpha: 0, duration: 0.4 });
-    gsap.to(center, { scale: 1.12, opacity: 0.9, repeat: -1, yoyo: true });
+    gsap.to(center, { scale: 1.12, opacity: 0.3, repeat: -1, yoyo: true });
 
     const playFirst = () => {
       if (firstVideoStarted.current) return;
       firstVideoStarted.current = true;
 
       gsap.killTweensOf(center);
-      gsap.to([center,p1,text1], { opacity: 0 });
+      gsap.to([center,p1,text1,loghi], { opacity: 0, duration: 0.8});
 
       v1.currentTime = 0;
       v1.play();
@@ -116,7 +120,10 @@ export const ParallaxImages: React.FC = () => {
 
         gsap.to([text, track], { opacity: 1, delay: 0.5 });
 
-        v2.onended = () => setShowCalendar(true);
+        v2.onended = () => {
+          setShowCalendar(true);
+          gsap.to(text2, { opacity: 1, duration: 0.8 });
+        }
       };
     };
 
@@ -189,8 +196,8 @@ export const ParallaxImages: React.FC = () => {
     />
 
     {/* SCRITTA ANIMATA "CARICAMENTO..." */}
-    <div className="text-white text-xl font-semibold flex gap-1">
-      <span>Caricamento</span>
+    <div className="font-christmas text-white text-xl font-semibold flex gap-1">
+      <span>LOADING</span>
       <span className="w-8 flex">
         <span className="dot1">.</span>
         <span className="dot2">.</span>
@@ -238,7 +245,14 @@ export const ParallaxImages: React.FC = () => {
 
       <div ref={containerRef} className="scene-container">
 
-                {/* Poster sotto Video1 */}
+        <img
+          ref={loghiref}
+          src="/img/topLocandina.png"
+          className="absolute top-[10%] w-[30%] object-contain h-[30%] left-[35%] pointer-events-none z-[2] opacity-1"
+          alt="poster1"
+        />
+
+        {/* Poster sotto Video1 */}
         <img
           ref={poster1}
           src="/img/frameMobile1.png"
@@ -258,7 +272,7 @@ export const ParallaxImages: React.FC = () => {
         />
 
         <div ref={centerRef} className="absolute top-[65%] left-1/2 w-20 h-20 border-4 border-white rounded-full -translate-x-1/2 -translate-y-1/2" />
-        <h2 ref={textRef1} className="absolute top-[85%] left-1/2 top-[48%] w-full text-center text-white -translate-x-1/2 -translate-y-1/2">
+        <h2 ref={textRef1} className="absolute font-christmas top-[85%] left-1/2 top-[48%] w-full text-center text-white -translate-x-1/2 -translate-y-1/2">
           DOPPIO CLICK PER CONTINUARE
         </h2>
         <img
@@ -280,10 +294,10 @@ export const ParallaxImages: React.FC = () => {
         />
 
         {/* Slider */}
-        <h2 ref={textRef} className="absolute top-[48%] w-full text-center text-white opacity-0 tracking-[0.3em]">
+        <h2 ref={textRef} className="font-christmas absolute top-[72%] left-[12.5%] w-[75%] text-center text-white opacity-0 tracking-[0.3em]">
           TRASCINA PER CONTINUARE
         </h2>
-        <div ref={trackRef} className="absolute top-[55%] left-1/2 w-[270px] h-10 -translate-x-1/2 opacity-0">
+        <div ref={trackRef} className="absolute top-[77%] left-1/2 w-[270px] h-10 -translate-x-1/2 opacity-0">
           <div className="absolute inset-0 -translate-y-1/2 border-b border-white/40" />
           <div ref={knobRef} className="absolute left-0 w-10 h-10 border-2 border-white rounded-full" />
         </div>
@@ -322,6 +336,9 @@ export const ParallaxImages: React.FC = () => {
             </div>
           </div>
         )}
+        <h2 ref={textRef2} className="font-christmas absolute top-[77%] left-[32.5%] w-[35%] text-[80%] text-center text-white opacity-0">
+          CLICCA SULLA DATA PER SCOPRIRE L'EVENTO DEL GIORNO
+        </h2>
       </div>
 
       {selectedImage && (
@@ -329,7 +346,7 @@ export const ParallaxImages: React.FC = () => {
           <img src={selectedImage} className="max-w-[80%] max-h-[80%] rounded-xl" />
           <button
             onClick={() => setSelectedImage(null)}
-            className="absolute top-8 right-8 text-red-600 text-3xl"
+            className="absolute font-christmas top-8 right-8 text-red-600 text-3xl"
           >
             X
           </button>
