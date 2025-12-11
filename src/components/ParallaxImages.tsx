@@ -5,10 +5,10 @@ import Draggable from "gsap/Draggable";
 gsap.registerPlugin(Draggable);
 
 const BOARD_CONFIG = {
-  left: 40.5,
+  left: 44,
   top: 46,
-  width: 20.5,
-  height: 35,
+  width: 12,
+  height: 15,
 };
 
 export const ParallaxImages: React.FC = () => {
@@ -298,15 +298,17 @@ export const ParallaxImages: React.FC = () => {
               width: `${BOARD_CONFIG.width}%`,
               height: `${BOARD_CONFIG.height}%`,
               pointerEvents: "none",
+              //border: "1px solid red",
             }}
           >
             <div
-              className="w-full h-[75%] grid"
+              className="w-full h-[100%] grid"
               style={{
                 gridTemplateColumns: "repeat(5, 1fr)",
                 gridTemplateRows: "repeat(3, 1fr)",
                 rowGap: "10%",
                 columnGap: "3%",
+                //background: "red"
               }}
             >
               {[20, 21, 22, 23, 24, 27, 28, 29, 30, 31, 2, 3, 4, 5, 6].map((day) => (
@@ -314,7 +316,7 @@ export const ParallaxImages: React.FC = () => {
                   key={day}
                   onClick={() => setSelectedImage(`/img/events/${day}.jpg`)}
                   className="cursor-pointer pointer-events-auto"
-                  style={{ opacity: 0, width: "80%", height: "80%" }}
+                  style={{ opacity: 0, width: "80%", height: "80%"}}
                 />
               ))}
             </div>
