@@ -210,7 +210,7 @@ export const ParallaxImages: React.FC = () => {
         {/* Video 1 */}
         <video
           ref={video1Ref}
-          src="/img/videoStart.mp4"
+          src="/img/videoStart1.mp4"
           playsInline
           muted
           preload="auto"
@@ -222,7 +222,7 @@ export const ParallaxImages: React.FC = () => {
 
         <img
           ref={poster2}
-          src="/img/interno.jpeg"
+          src="/img/frame-1.png"
           className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-0"
           alt="poster2"
         />
