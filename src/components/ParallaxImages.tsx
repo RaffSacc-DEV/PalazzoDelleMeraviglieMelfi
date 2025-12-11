@@ -241,7 +241,7 @@ export const ParallaxImages: React.FC = () => {
                 {/* Poster sotto Video1 */}
         <img
           ref={poster1}
-          src="/img/frameStart.png"
+          src="/img/frameStartDisegno.png"
           className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-1"
           alt="poster1"
         />
@@ -249,7 +249,7 @@ export const ParallaxImages: React.FC = () => {
         {/* Video 1 */}
         <video
           ref={video1Ref}
-          src="/img/videoStart1.mp4"
+          src="/img/videoDisegnoStart.mp4"
           playsInline
           muted
           preload="auto"
@@ -263,7 +263,7 @@ export const ParallaxImages: React.FC = () => {
         </h2>
         <img
           ref={poster2}
-          src="/img/frame-1.png"
+          src="/img/frame-2.png"
           className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-0"
           alt="poster2"
         />
@@ -271,7 +271,7 @@ export const ParallaxImages: React.FC = () => {
         {/* Video 2 */}
         <video
           ref={video2Ref}
-          src="/img/videoInterno1.mp4"
+          src="/img/videoInternoDisegno.mp4"
           playsInline
           muted
           preload="auto"
