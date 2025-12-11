@@ -13,14 +13,13 @@ const BOARD_CONFIG = {
 
 export const ParallaxImages: React.FC = () => {
   const [ready, setReady] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const poster1 = useRef<HTMLImageElement>(null);
-  const poster2 = useRef<HTMLImageElement>(null);
+  const poster1= useRef<HTMLImageElement>(null);
+  const poster2= useRef<HTMLImageElement>(null);
   const video1Ref = useRef<HTMLVideoElement>(null);
   const video2Ref = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -28,6 +27,7 @@ export const ParallaxImages: React.FC = () => {
   const trackRef = useRef<HTMLDivElement>(null);
   const centerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
+  const textRef1 = useRef<HTMLHeadingElement>(null);
 
   const sliderUnlocked = useRef(false);
   const firstVideoStarted = useRef(false);
@@ -44,47 +44,43 @@ export const ParallaxImages: React.FC = () => {
     };
   }, []);
 
-  /* 🎞️ PRELOAD VIDEO + PROGRESS */
+  /* 🎞️ PRELOAD VIDEO */
   useEffect(() => {
     const v1 = video1Ref.current;
     const v2 = video2Ref.current;
     if (!v1 || !v2) return;
 
-    const media = [v1, v2];
     let loaded = 0;
-
-    const onLoad = () => {
+    const done = () => {
       loaded++;
-      setProgress(Math.round((loaded / media.length) * 100));
-      if (loaded === media.length) setReady(true);
+      if (loaded >= 2) setReady(true);
     };
 
-    media.forEach((m) => {
-      if (m.readyState >= 3) onLoad();
-      else m.addEventListener("canplaythrough", onLoad, { once: true });
+    [v1, v2].forEach((m) => {
+      if (m.readyState >= 3) done();
+      else m.addEventListener("canplaythrough", done, { once: true });
     });
   }, []);
 
   /* 📌 FALLBACK iPhone */
   useEffect(() => {
-    const t = setTimeout(() => {
-      setProgress(100);
-      setReady(true);
-    }, 5000);
+    const t = setTimeout(() => setReady(true), 5000);
     return () => clearTimeout(t);
   }, []);
 
-  /* 🔊 AUDIO */
+  /* 🔊 AUDIO SOLO DA CLICK BOTTONE */
   const toggleAudio = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    if (!audioRef.current) return;
 
-    const nowMuted = !audio.muted;
-    audio.muted = !audio.muted;
-    setIsMuted(nowMuted);
-
-    if (!nowMuted) audio.play().catch(() => {});
-    else audio.pause();
+    if (audioRef.current.muted) {
+      audioRef.current.muted = false;
+      setIsMuted(false);
+      audioRef.current.play().catch(() => {});
+    } else {
+      audioRef.current.muted = true;
+      setIsMuted(true);
+      audioRef.current.pause();
+    }
   };
 
   /* 🎬 ANIMAZIONI */
@@ -98,10 +94,11 @@ export const ParallaxImages: React.FC = () => {
     const knob = knobRef.current!;
     const track = trackRef.current!;
     const text = textRef.current!;
+    const text1 = textRef1.current!;
     const center = centerRef.current!;
     const container = containerRef.current!;
 
-    gsap.to("#preloader", { autoAlpha: 0, duration: 0.6 });
+    gsap.to("#preloader", { autoAlpha: 0, duration: 0.4 });
     gsap.to(center, { scale: 1.12, opacity: 0.9, repeat: -1, yoyo: true });
 
     const playFirst = () => {
@@ -109,14 +106,13 @@ export const ParallaxImages: React.FC = () => {
       firstVideoStarted.current = true;
 
       gsap.killTweensOf(center);
-      gsap.to([center, p1], { opacity: 0 });
+      gsap.to([center,p1,text1], { opacity: 0 });
 
       v1.currentTime = 0;
       v1.play();
-
       v1.onended = () => {
         gsap.to(v1, { opacity: 0, duration: 0.8 });
-        gsap.to([v2, p2], { opacity: 1, duration: 0.8 });
+        gsap.to([v2,p2], { opacity: 1, duration: 0.8 });
 
         gsap.to([text, track], { opacity: 1, delay: 0.5 });
 
@@ -124,7 +120,7 @@ export const ParallaxImages: React.FC = () => {
       };
     };
 
-    /* TAP / DOUBLE TAP */
+    /* TAP / DOPPIO TAP */
     let lastTap = 0;
     container.addEventListener("dblclick", playFirst);
     container.addEventListener("touchend", () => {
@@ -180,34 +176,48 @@ export const ParallaxImages: React.FC = () => {
         }
       `}</style>
 
-      {/* 🌟 LOADER GRAFICO */}
       {!ready && (
-        <div
-          id="preloader"
-          className="fixed inset-0 bg-black flex flex-col items-center justify-center z-[9999]"
-        >
-          <div className="relative w-[180px] h-[180px]">
-            {/* immagine base */}
-            <img
-              src="/img/loader.png"
-              className="absolute inset-0 w-full h-full object-contain opacity-20"
-            />
+  <div
+    id="preloader"
+    className="fixed inset-0 bg-[#791434] flex flex-col items-center justify-center z-[9999]"
+  >
+    {/* IMMAGINE DI CARICAMENTO */}
+    <img
+      src="/img/palazzoLogoRosso.jpg"
+      alt="loader"
+      className="w-[180px] h-[180px] object-contain mb-6"
+    />
 
-            {/* immagine che si riempie */}
-            <div
-              className="absolute bottom-0 left-0 w-full overflow-hidden"
-              style={{ height: `${progress}%` }}
-            >
-              <img
-                src="/img/palazzoLogoRosso.jpg"
-                className="w-full h-full object-contain"
-              />
-            </div>
-          </div>
+    {/* SCRITTA ANIMATA "CARICAMENTO..." */}
+    <div className="text-white text-xl font-semibold flex gap-1">
+      <span>Caricamento</span>
+      <span className="w-8 flex">
+        <span className="dot1">.</span>
+        <span className="dot2">.</span>
+        <span className="dot3">.</span>
+      </span>
+    </div>
 
-          <div className="text-white mt-6 text-lg font-bold">{progress}%</div>
-        </div>
-      )}
+    {/* ANIMAZIONE DEI TRE PUNTINI */}
+    <style>
+      {`
+        .dot1, .dot2, .dot3 {
+          opacity: 0;
+          animation: blink 1.4s infinite;
+        }
+        .dot2 { animation-delay: 0.2s; }
+        .dot3 { animation-delay: 0.4s; }
+
+        @keyframes blink {
+          0% { opacity: 0; }
+          50% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `}
+    </style>
+  </div>
+)}
+
 
       {/* AUDIO BUTTON */}
       <button
@@ -217,67 +227,65 @@ export const ParallaxImages: React.FC = () => {
         {isMuted ? "🔇" : "🔊"}
       </button>
 
-      <audio ref={audioRef} src="/img/musica.mp3" preload="auto" loop muted />
+      <audio
+        ref={audioRef}
+        src="/img/musica.mp3"
+        preload="auto"
+        playsInline
+        loop
+        muted
+      />
 
       <div ref={containerRef} className="scene-container">
 
-        {/* POSTER SOTTO VIDEO 1 */}
+                {/* Poster sotto Video1 */}
         <img
           ref={poster1}
           src="/img/frameStart.png"
-          className="absolute w-full h-full object-cover z-[0] opacity-1"
+          className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-1"
+          alt="poster1"
         />
 
-        {/* VIDEO 1 */}
+        {/* Video 1 */}
         <video
           ref={video1Ref}
           src="/img/videoStart1.mp4"
           playsInline
           muted
           preload="auto"
+          poster="/img/imgStart.jpg"
           className="absolute w-full h-full object-cover"
         />
 
-        {/* CENTER CIRCLE */}
-        <div
-          ref={centerRef}
-          className="absolute top-[65%] left-1/2 w-20 h-20 border-4 border-white rounded-full -translate-x-1/2 -translate-y-1/2"
-        />
-
-        {/* POSTER SOTTO VIDEO 2 */}
+        <div ref={centerRef} className="absolute top-[65%] left-1/2 w-20 h-20 border-4 border-white rounded-full -translate-x-1/2 -translate-y-1/2" />
+        <h2 ref={textRef1} className="absolute top-[85%] left-1/2 top-[48%] w-full text-center text-white -translate-x-1/2 -translate-y-1/2">
+          DOPPIO CLICK PER CONTINUARE
+        </h2>
         <img
           ref={poster2}
           src="/img/frame-1.png"
-          className="absolute w-full h-full object-cover z-[0] opacity-0"
+          className="absolute w-full h-full object-cover pointer-events-none z-[0] opacity-0"
+          alt="poster2"
         />
 
-        {/* VIDEO 2 */}
+        {/* Video 2 */}
         <video
           ref={video2Ref}
           src="/img/videoInterno1.mp4"
           playsInline
           muted
           preload="auto"
+          poster="/img/interno.jpg"
           className="absolute w-full h-full object-cover opacity-0"
         />
 
-        {/* SLIDER */}
-        <h2
-          ref={textRef}
-          className="absolute top-[48%] w-full text-center text-white opacity-0 tracking-[0.3em]"
-        >
+        {/* Slider */}
+        <h2 ref={textRef} className="absolute top-[48%] w-full text-center text-white opacity-0 tracking-[0.3em]">
           TRASCINA PER CONTINUARE
         </h2>
-
-        <div
-          ref={trackRef}
-          className="absolute top-[55%] left-1/2 w-[270px] h-10 -translate-x-1/2 opacity-0"
-        >
+        <div ref={trackRef} className="absolute top-[55%] left-1/2 w-[270px] h-10 -translate-x-1/2 opacity-0">
           <div className="absolute inset-0 -translate-y-1/2 border-b border-white/40" />
-          <div
-            ref={knobRef}
-            className="absolute left-0 w-10 h-10 border-2 border-white rounded-full"
-          />
+          <div ref={knobRef} className="absolute left-0 w-10 h-10 border-2 border-white rounded-full" />
         </div>
 
         {/* CALENDARIO */}
@@ -301,30 +309,22 @@ export const ParallaxImages: React.FC = () => {
                 columnGap: "3%",
               }}
             >
-              {[20, 21, 22, 23, 24, 27, 28, 29, 30, 31, 2, 3, 4, 5, 6].map(
-                (day) => (
-                  <button
-                    key={day}
-                    onClick={() =>
-                      setSelectedImage(`/img/events/${day}.jpg`)
-                    }
-                    className="cursor-pointer pointer-events-auto"
-                    style={{ opacity: 0, width: "80%", height: "80%" }}
-                  />
-                )
-              )}
+              {[20, 21, 22, 23, 24, 27, 28, 29, 30, 31, 2, 3, 4, 5, 6].map((day) => (
+                <button
+                  key={day}
+                  onClick={() => setSelectedImage(`/img/events/${day}.jpg`)}
+                  className="cursor-pointer pointer-events-auto"
+                  style={{ opacity: 0, width: "80%", height: "80%" }}
+                />
+              ))}
             </div>
           </div>
         )}
       </div>
 
-      {/* POPUP */}
       {selectedImage && (
         <div className="fixed inset-0 bg-black/80 z-[999] flex items-center justify-center">
-          <img
-            src={selectedImage}
-            className="max-w-[80%] max-h-[80%] rounded-xl"
-          />
+          <img src={selectedImage} className="max-w-[80%] max-h-[80%] rounded-xl" />
           <button
             onClick={() => setSelectedImage(null)}
             className="absolute top-8 right-8 text-red-600 text-3xl"
