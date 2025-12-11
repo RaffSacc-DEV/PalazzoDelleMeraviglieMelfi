@@ -20,6 +20,7 @@ export const ParallaxImages: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const poster1= useRef<HTMLImageElement>(null);
   const poster2= useRef<HTMLImageElement>(null);
+  const loghi= useRef<HTMLImageElement>(null);
   const video1Ref = useRef<HTMLVideoElement>(null);
   const video2Ref = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -91,6 +92,7 @@ export const ParallaxImages: React.FC = () => {
     const v2 = video2Ref.current!;
     const p1 = poster1.current!;
     const p2 = poster2.current!;
+    const l = loghi.current!;
     const knob = knobRef.current!;
     const track = trackRef.current!;
     const text = textRef.current!;
@@ -99,14 +101,14 @@ export const ParallaxImages: React.FC = () => {
     const container = containerRef.current!;
 
     gsap.to("#preloader", { autoAlpha: 0, duration: 0.4 });
-    gsap.to(center, { scale: 1.12, opacity: 0.9, repeat: -1, yoyo: true });
+    gsap.to(center, { scale: 1.12, opacity: 0.3, repeat: -1, yoyo: true });
 
     const playFirst = () => {
       if (firstVideoStarted.current) return;
       firstVideoStarted.current = true;
 
       gsap.killTweensOf(center);
-      gsap.to([center,p1,text1], { opacity: 0 });
+      gsap.to([center,p1,text1,l], { opacity: 0, duration: 0.8 });
 
       v1.currentTime = 0;
       v1.play();
@@ -237,55 +239,64 @@ export const ParallaxImages: React.FC = () => {
       />
 
       <div ref={containerRef} className="scene-container">
+        <img
+          ref={loghi}
+          src="/img/topLocandina.png"
+          className="absolute object-contain w-[30%] h-[30%] top-[-5%] left-[35%] pointer-events-none z-[2] opacity-1"
+          alt="loghi"
+        />
 
                 {/* Poster sotto Video1 */}
         <img
-          ref={poster1}
-          src="/img/frameStartDisegno.png"
-          className="absolute object-fill pointer-events-none z-[0] opacity-1"
-          alt="poster1"
-        />
+  ref={poster1}
+  src="/img/frameMobile1.png"
+  className="absolute object-contain w-full h-full inset-0 m-auto pointer-events-none z-[0]"
+  alt="poster1"
+/>
+
 
         {/* Video 1 */}
         <video
           ref={video1Ref}
-          src="/img/videoDisegnoStart.mp4"
+          src="/img/mobile1.mp4"
           playsInline
           muted
           preload="auto"
           poster="/img/imgStart.jpg"
-          className="absolute object-fill"
+          className="absolute w-full h-full"
         />
 
-        <div ref={centerRef} className="absolute top-[65%] left-1/2 w-20 h-20 border-4 border-white rounded-full -translate-x-1/2 -translate-y-1/2" />
-        <h2 ref={textRef1} className="absolute top-[85%] left-1/2 top-[48%] w-full text-center text-white -translate-x-1/2 -translate-y-1/2">
+        
+
+        <div ref={centerRef} className="absolute top-[65%] left-1/2 w-20 h-20 border-4 border-[#e9d47b] rounded-full -translate-x-1/2 -translate-y-1/2" />
+        <h2 ref={textRef1} className="absolute top-[85%] font-christmas left-1/2 top-[48%] w-full text-[65%] text-center text-[black] -translate-x-1/2 -translate-y-1/2" style={{ WebkitTextStroke: "0.7px black" }}>
           DOPPIO CLICK PER CONTINUARE
         </h2>
         <img
           ref={poster2}
-          src="/img/frame-2.png"
-          className="absolute object-fill pointer-events-none z-[0] opacity-0"
+          src="/img/frameMobile2.png"
+          className="absolute object-contain w-full h-full pointer-events-none z-[0] opacity-0"
           alt="poster2"
         />
 
         {/* Video 2 */}
         <video
           ref={video2Ref}
-          src="/img/videoInternoDisegno.mp4"
+          src="/img/mobile2.mp4"
           playsInline
           muted
           preload="auto"
           poster="/img/interno.jpg"
-          className="absolute object-fill opacity-0"
+          className="absolute w-full h-full opacity-0"
         />
 
         {/* Slider */}
-        <h2 ref={textRef} className="absolute top-[48%] w-full text-center text-white opacity-0 tracking-[0.3em]">
+        <h2 ref={textRef} className="absolute font-christmas top-[42%] w-full text-[65%] text-center text-black opacity-0 tracking-[0.3em]" style={{ WebkitTextStroke: "0.7px black" }}>
           TRASCINA PER CONTINUARE
         </h2>
         <div ref={trackRef} className="absolute top-[55%] left-1/2 w-[270px] h-10 -translate-x-1/2 opacity-0">
-          <div className="absolute inset-0 -translate-y-1/2 border-b border-white/40" />
-          <div ref={knobRef} className="absolute left-0 w-10 h-10 border-2 border-white rounded-full" />
+          <div className="absolute inset-0 -translate-y-1/2 border-b-4 border-[#761c29]/60" />
+          <div ref={knobRef} className="absolute left-0 w-10 h-10 border-4 border-[#761c29] rounded-full" />
         </div>
 
         {/* CALENDARIO */}
