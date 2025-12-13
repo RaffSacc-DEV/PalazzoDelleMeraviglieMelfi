@@ -275,7 +275,6 @@ export const ParallaxImages: React.FC = () => {
           playsInline
           muted
           preload="auto"
-          poster="/img/imgStart.jpg"
           className="absolute w-full h-full"
         />
 
@@ -297,7 +296,6 @@ export const ParallaxImages: React.FC = () => {
           playsInline
           muted
           preload="auto"
-          poster="/img/interno.jpg"
           className="absolute w-full h-full opacity-0"
         />
 
