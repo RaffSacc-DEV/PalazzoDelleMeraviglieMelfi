@@ -5,10 +5,10 @@ import Draggable from "gsap/Draggable";
 gsap.registerPlugin(Draggable);
 
 const BOARD_CONFIG = {
-  left: 44,
-  top: 46,
-  width: 12,
-  height: 15,
+  left: 41.5,
+  top: 45,
+  width: 18,
+  height: 22,
 };
 
 export const ParallaxImages: React.FC = () => {
@@ -122,7 +122,15 @@ export const ParallaxImages: React.FC = () => {
 
         v2.onended = () => {
           setShowCalendar(true);
-          gsap.to(text2, { opacity: 1, duration: 0.8 });
+          gsap.to(text2, { 
+              opacity: 1, 
+              duration: 0.8,
+              onComplete: () => {
+                          const link = document.querySelector(".powered-link") as HTMLElement;
+                          if (link) link.style.pointerEvents = "auto"; // 🔥 attiva i click!
+                         }
+            });
+
         }
       };
     };
@@ -285,7 +293,7 @@ export const ParallaxImages: React.FC = () => {
         {/* Video 2 */}
         <video
           ref={video2Ref}
-          src="/img/mobile2.mp4"
+          src="/img/mobileVideo1.mp4"
           playsInline
           muted
           preload="auto"
@@ -297,7 +305,7 @@ export const ParallaxImages: React.FC = () => {
         <h2 ref={textRef} className="font-christmas absolute top-[72%] left-[12.5%] w-[75%] text-center text-white opacity-0 tracking-[0.3em]">
           TRASCINA PER CONTINUARE
         </h2>
-        <div ref={trackRef} className="absolute top-[77%] left-1/2 w-[270px] h-10 -translate-x-1/2 opacity-0">
+        <div ref={trackRef} className="absolute top-[77%] left-1/2 w-[270px] h-10 -translate-x-1/2 opacity-0 z-[1000]">
           <div className="absolute inset-0 -translate-y-1/2 border-b border-white/40" />
           <div ref={knobRef} className="absolute left-0 w-10 h-10 border-2 border-white rounded-full" />
         </div>
@@ -312,7 +320,6 @@ export const ParallaxImages: React.FC = () => {
               width: `${BOARD_CONFIG.width}%`,
               height: `${BOARD_CONFIG.height}%`,
               pointerEvents: "none",
-              //border: "1px solid red",
             }}
           >
             <div
@@ -320,9 +327,8 @@ export const ParallaxImages: React.FC = () => {
               style={{
                 gridTemplateColumns: "repeat(5, 1fr)",
                 gridTemplateRows: "repeat(3, 1fr)",
-                rowGap: "10%",
-                columnGap: "3%",
-                //background: "red"
+                rowGap: "8%",
+                columnGap: "5%",
               }}
             >
               {[20, 21, 22, 23, 24, 27, 28, 29, 30, 31, 2, 3, 4, 5, 6].map((day) => (
@@ -330,14 +336,22 @@ export const ParallaxImages: React.FC = () => {
                   key={day}
                   onClick={() => setSelectedImage(`/img/events/${day}.jpg`)}
                   className="cursor-pointer pointer-events-auto"
-                  style={{ opacity: 0, width: "80%", height: "80%"}}
+                  style={{width: "100%", height: "100%"}}
                 />
               ))}
             </div>
           </div>
         )}
         <h2 ref={textRef2} className="font-christmas absolute top-[77%] left-[32.5%] w-[35%] text-[80%] text-center text-white opacity-0">
-          CLICCA SULLA DATA PER SCOPRIRE L'EVENTO DEL GIORNO
+          CLICCA SULLA DATA <br/> PER SCOPRIRE L'EVENTO DEL GIORNO
+          <a
+            href="https://www.instagram.com/isac.agency"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="powered-link block font-christmas mt-2 text-[70%] text-white/80 underline pointer-events-none"
+            >
+            powered by isac.agency
+          </a>
         </h2>
       </div>
 
